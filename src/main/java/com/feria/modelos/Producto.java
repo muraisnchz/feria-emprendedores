@@ -1,43 +1,30 @@
 package com.feria.modelos;
 
-
 public class Producto {
+    private String nombre;
+    private double precio;
+    private int stock;
+    private static final int UMBRAL_STOCK_BAJO = 5;
 
-
-    public String nombre;
-    public double precio;
-    public int stock;
-    public String categoriaProducto;  // duplicado con la categoría del emprendedor
-    public String emprendedorId;      // referencia inconsistente
-
-    public Producto(String nombre, double precio, int stock, String categoriaProd, String empId) {
+    public Producto(String nombre, double precio, int stock) {
         this.nombre = nombre;
         this.precio = precio;
         this.stock = stock;
-        this.categoriaProducto = categoriaProd;
-        this.emprendedorId = empId;
     }
 
-
-    public double valorTotal() {
-        return precio * stock;
-    }
-
-
-    public String mostrar() {
-        return nombre + " - $" + precio + " (stock: " + stock + ")";
-    }
-
-
-    public boolean hayStockBajo() {
-        if (stock < 5) {
-            return true;
+    public void reducirStock(int cantidad) {
+        if (cantidad > this.stock) {
+            throw new IllegalArgumentException("Stock insuficiente para: " + nombre);
         }
-        return false;
+        this.stock -= cantidad;
     }
 
-
-    public boolean isStockBajo() {
-        return stock < 5;
+    public boolean tieneStockBajo() {
+        return this.stock < UMBRAL_STOCK_BAJO;
     }
+
+    // Getters
+    public String getNombre() { return nombre; }
+    public double getPrecio() { return precio; }
+    public int getStock() { return stock; }
 }

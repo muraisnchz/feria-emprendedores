@@ -1,56 +1,42 @@
 package com.feria.modelos;
 
+import java.time.LocalDate;
+
 public class Venta {
+    private String idVenta;
+    private Producto producto;
+    private int cantidad;
+    private LocalDate fecha;
+    private boolean pagoRealizado;
 
-    public String idVenta;
-    public String emprendedorId;
-    public String productoNombre;
-    public int cantidad;
-    public double precioUnitario;
-    public String fecha;
-    public boolean pagoRealizado;
-
-    public Venta(String idVenta, String empId, String prodNombre, int cant, double precioUnit, String fecha) {
+    public Venta(String idVenta, Producto producto, int cantidad) {
         this.idVenta = idVenta;
-        this.emprendedorId = empId;
-        this.productoNombre = prodNombre;
-        this.cantidad = cant;
-        this.precioUnitario = precioUnit;
-        this.fecha = fecha;
+        this.producto = producto;
+        this.cantidad = cantidad;
+        this.fecha = LocalDate.now();
         this.pagoRealizado = false;
     }
 
-    public double calcularTotalConDescuento() {
-        double total = cantidad * precioUnitario;
+    public double calcularTotal() {
+        double subtotal = cantidad * producto.getPrecio();
+        return aplicarDescuentos(subtotal);
+    }
 
+    // Método corto con una sola responsabilidad (calcular el descuento)
+    private double aplicarDescuentos(double subtotal) {
         if (cantidad > 10) {
-            total = total * 0.9;
+            subtotal *= 0.90;
         }
-
-        if (total > 5000) {
-            total = total * 0.95;
+        if (subtotal > 5000) {
+            subtotal *= 0.95;
         }
-
-        return total;
+        return subtotal;
     }
 
-    public void registrarPagoYActualizarStock(Producto p) {
+    public void registrarPago() {
+        this.producto.reducirStock(this.cantidad);
         this.pagoRealizado = true;
-        if (p != null) {
-            p.stock = p.stock - this.cantidad;
-        }
-        System.out.println("Pago registrado y stock actualizado");
     }
 
-    public String generarRecibo() {
-        String recibo = "=== RECIBO DE VENTA ===\n";
-        recibo += "Venta ID: " + idVenta + "\n";
-        recibo += "Fecha: " + fecha + "\n";
-        recibo += "Producto: " + productoNombre + "\n";
-        recibo += "Cantidad: " + cantidad + "\n";
-        recibo += "Precio unitario: $" + precioUnitario + "\n";
-        recibo += "Total con descuentos: $" + calcularTotalConDescuento() + "\n";
-        recibo += "Pago: " + (pagoRealizado ? "Realizado" : "Pendiente") + "\n";
-        return recibo;
-    }
+    public boolean isPagoRealizado() { return pagoRealizado; }
 }

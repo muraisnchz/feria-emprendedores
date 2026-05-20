@@ -1,62 +1,38 @@
 package com.feria.servicios;
 
-import com.feria.modelos.*;
+import com.feria.modelos.Categoria;
+import com.feria.modelos.Emprendedor;
+import com.feria.modelos.Venta;
+import java.util.List;
 
 public class Reportes {
 
-    public String generarReportePorCategoria(GestorFeria gestor, String categoria) {
-        String reporte = "=== REPORTE DE EMPRENDEDORES - CATEGORÍA: " + categoria + " ===\n";
-
-        for (Emprendedor e : gestor.emprendedores) {
-            if (e.cat.equals(categoria)) {
-                reporte += e.mostrarInfoYValidar();
-                reporte += "---\n";
-            }
-        }
-
-        return reporte;
-    }
-
-    public String generarReportePorCategoriaAlternativo(GestorFeria gestor, String cat) {
-        String resultado = "REPORTE CATEGORIA " + cat + "\n";
-        for (Emprendedor e : gestor.emprendedores) {
-            if (e.cat.equals(cat)) {
-                resultado += e.getNombre() + "\n";
-            }
-        }
-        return resultado;
-    }
-
-    public double calcularVentasTotales(GestorFeria gestor) {
+    public double calcularFacturacionTotal(List<Venta> ventas) {
         double total = 0;
-        for (Venta v : gestor.ventas) {
-            total += v.calcularTotalConDescuento();
+        for (Venta v : ventas) {
+            total += v.calcularTotal();
         }
         return total;
     }
 
     public void imprimirResumenEjecutivo(GestorFeria gestor) {
         System.out.println("========== RESUMEN EJECUTIVO ==========");
-        System.out.println("Total emprendedores: " + gestor.emprendedores.size());
-        System.out.println("Total productos: " + gestor.productos.size());
-        System.out.println("Total ventas: " + gestor.ventas.size());
-
-        double totalVentas = 0;
-        for (Venta v : gestor.ventas) {
-            totalVentas += v.calcularTotalConDescuento();
+        System.out.println("Total emprendedores: " + gestor.getEmprendedores().size());
+        System.out.println("Total ventas: " + gestor.getVentas().size());
+        System.out.println("Total facturado: $" + calcularFacturacionTotal(gestor.getVentas()));
+        
+        System.out.println("\nEmprendedores con alerta de stock bajo:");
+        for (Emprendedor e : gestor.getEmprendedoresConStockBajo()) {
+            System.out.println("- " + e.getNombre());
         }
-        System.out.println("Total facturado: $" + totalVentas);
+    }
 
-        int emprendedoresStockBajo = 0;
-        for (Emprendedor e : gestor.emprendedores) {
-            for (Producto p : e.prods) {
-                if (p.stock < 5) {
-                    emprendedoresStockBajo++;
-                    break;
-                }
+    public void imprimirReportePorCategoria(GestorFeria gestor, Categoria categoria) {
+        System.out.println("=== REPORTE DE EMPRENDEDORES - CATEGORÍA: " + categoria + " ===");
+        for (Emprendedor e : gestor.getEmprendedores()) {
+            if (e.getCategoria() == categoria) {
+                System.out.println("- " + e.getNombre() + " (Contacto: " + e.getEmail() + ")");
             }
         }
-        System.out.println("Emprendedores con stock bajo: " + emprendedoresStockBajo);
-        System.out.println("=======================================");
     }
 }

@@ -3,7 +3,6 @@ package com.feria;
 import com.feria.modelos.*;
 import com.feria.servicios.*;
 import com.feria.utils.*;
-import java.util.Arrays;
 
 public class Main {
 
@@ -11,33 +10,85 @@ public class Main {
         GestorFeria gestor = new GestorFeria();
         Reportes reportes = new Reportes();
 
-        gestor.registrarEmprendedorConProductos(
-            "Ana", "E001", "3423456789", "ana@gmail.com", "comida",
-            Arrays.asList("Empanadas", "Tortas", "Alfajores"),
-            Arrays.asList(500.0, 1500.0, 300.0),
-            Arrays.asList(50, 10, 100)
-        );
+        // 1. Registro de Ana (Construcción Orientada a Objetos)
+        Emprendedor ana = new Emprendedor("Ana", "E001", "3423456789", "ana@gmail.com", Categoria.COMIDA);
+        Producto pEmpanadas = new Producto("Empanadas", 500.0, 50);
+        Producto pTortas = new Producto("Tortas", 1500.0, 10);
+        Producto pAlfajores = new Producto("Alfajores", 300.0, 100);
+        
+        ana.agregarProducto(pEmpanadas);
+        ana.agregarProducto(pTortas);
+        ana.agregarProducto(pAlfajores);
+        
+        gestor.registrarEmprendedor(ana);
+        System.out.println("Emprendedor registrado con " + ana.getProductos().size() + " productos");
 
-        Emprendedor emp2 = new Emprendedor("Carlos", "E002", "3423987654", "carlos@hotmail.com", "artesania");
-        Producto p1 = new Producto("Collar", 2000.0, 5, "artesania", "E002");
-        Producto p2 = new Producto("Pulsera", 800.0, 20, "artesania", "E002");
-        emp2.agregarProducto(p1);
-        emp2.agregarProducto(p2);
-        gestor.emprendedores.add(emp2);
-        gestor.productos.add(p1);
-        gestor.productos.add(p2);
+        // 2. Registro de Carlos
+        Emprendedor carlos = new Emprendedor("Carlos", "E002", "3423987654", "carlos@hotmail.com", Categoria.ARTESANIA);
+        Producto pCollar = new Producto("Collar", 2000.0, 5);
+        Producto pPulsera = new Producto("Pulsera", 800.0, 20);
+        
+        carlos.agregarProducto(pCollar);
+        carlos.agregarProducto(pPulsera);
+        
+        gestor.registrarEmprendedor(carlos);
 
-        gestor.registrarVenta("V001", "E001", "Empanadas", 10, 500.0, "2026-05-12");
-        gestor.registrarVenta("V002", "E002", "Collar", 1, 2000.0, "2026-05-12");
+        // 3. Registrar Ventas (inyectando el objeto Producto directamente)
+        Venta v1 = new Venta("V001", pEmpanadas, 10);
+        Venta v2 = new Venta("V002", pCollar, 1);
+        
+        gestor.registrarVenta(v1);
+        System.out.println("Venta registrada. Nuevo stock proyectado: " + (pEmpanadas.getStock() - 10));
+        gestor.registrarVenta(v2);
+        System.out.println("Venta registrada. Nuevo stock proyectado: " + (pCollar.getStock() - 1));
 
-        System.out.println(reportes.generarReportePorCategoria(gestor, "comida"));
+        System.out.println(); // Salto de línea estético
 
-        gestor.procesarVentasPendientesYCobrar();
+        // 4. Reporte por categoría (Usando el enum)
+        reportes.imprimirReportePorCategoria(gestor, Categoria.COMIDA);
 
+        System.out.println(); // Salto de línea estético
+
+        // 5. Procesar ventas pendientes y cobrar (Lógica extraída a la capa de control/main)
+        double totalRecaudado = 0;
+        for (Venta v : gestor.getVentas()) {
+            if (!v.isPagoRealizado()) {
+                double monto = v.calcularTotal();
+                v.registrarPago(); // ¡Aquí el objeto Venta llama a reducirStock() de forma segura!
+                totalRecaudado += monto;
+                System.out.println("Pago registrado y stock actualizado");
+                System.out.println("Cobrada venta por $" + monto);
+            }
+        }
+        System.out.println("Total recaudado: $" + totalRecaudado);
+        System.out.println();
+
+        // 6. Resumen Ejecutivo
         reportes.imprimirResumenEjecutivo(gestor);
+        System.out.println();
 
-        System.out.println("Emprendedor Ana válido? " + Validadores.validarEmprendedorCompleto(gestor.emprendedores.get(0)));
+        // 7. Validación manual usando la clase de utilidades
+        boolean anaEsValida = Validadores.isEmprendedorValido(gestor.getEmprendedores().get(0));
+        System.out.println("Emprendedor Ana válido? " + anaEsValida);
 
-        System.out.println(gestor.emprendedores.get(0).mostrarInfoYValidar());
+        // 8. Mostrar Info (Lógica de vista separada del modelo de datos)
+        imprimirInfoEmprendedor(gestor.getEmprendedores().get(0), "E001");
+    }
+
+    /**
+     * Método auxiliar (Vista): Extraemos esto de la clase Emprendedor para 
+     * no violar el Principio de Responsabilidad Única (SRP).
+     */
+    private static void imprimirInfoEmprendedor(Emprendedor e, String idGenerico) {
+        System.out.println("Emprendedor: " + e.getNombre());
+        // (Nota: Si agregaste "public String getId()" en el refactor de Emprendedor, puedes usar e.getId() aquí)
+        System.out.println("ID: " + idGenerico);
+        System.out.println("Contacto: " + e.getTelefono() + " | " + e.getEmail());
+        System.out.println("Categoría: " + e.getCategoria().name().toLowerCase());
+        
+        System.out.println("Productos:");
+        for (Producto p : e.getProductos()) {
+            System.out.println("  - " + p.getNombre() + " ($" + p.getPrecio() + ")");
+        }
     }
 }
