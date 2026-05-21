@@ -42,7 +42,7 @@ public class Main {
         gestor.registrarVenta(v2);
         System.out.println("Venta registrada. Nuevo stock proyectado: " + (pCollar.getStock() - 1));
 
-        System.out.println(); // Salto de línea estético
+        System.out.println();
 
         //Reporte por categoría (Usando el enum)
         reportes.imprimirReportePorCategoria(gestor, Categoria.COMIDA);
@@ -54,7 +54,7 @@ public class Main {
         for (Venta v : gestor.getVentas()) {
             if (!v.isPagoRealizado()) {
                 double monto = v.calcularTotal();
-                v.registrarPago(); // ¡Aquí el objeto Venta llama a reducirStock() de forma segura!
+                v.registrarPago(); //El objeto Venta llama a reducirStock()
                 totalRecaudado += monto;
                 System.out.println("Pago registrado y stock actualizado");
                 System.out.println("Cobrada venta por $" + monto);
