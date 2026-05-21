@@ -26,6 +26,7 @@ public class Emprendedor {
 
     // Getters
     public String getNombre() { return nombre; }
+    public String getId() {return id; }
     public String getEmail() { return email; }
     public String getTelefono() { return telefono; }
     public Categoria getCategoria() { return categoria; }

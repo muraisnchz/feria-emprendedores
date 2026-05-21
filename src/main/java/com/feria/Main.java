@@ -10,7 +10,7 @@ public class Main {
         GestorFeria gestor = new GestorFeria();
         Reportes reportes = new Reportes();
 
-        // 1. Registro de Ana (Construcción Orientada a Objetos)
+        //Registro de Ana (Construcción Orientada a Objetos)
         Emprendedor ana = new Emprendedor("Ana", "E001", "3423456789", "ana@gmail.com", Categoria.COMIDA);
         Producto pEmpanadas = new Producto("Empanadas", 500.0, 50);
         Producto pTortas = new Producto("Tortas", 1500.0, 10);
@@ -23,7 +23,7 @@ public class Main {
         gestor.registrarEmprendedor(ana);
         System.out.println("Emprendedor registrado con " + ana.getProductos().size() + " productos");
 
-        // 2. Registro de Carlos
+        //Registro de Carlos
         Emprendedor carlos = new Emprendedor("Carlos", "E002", "3423987654", "carlos@hotmail.com", Categoria.ARTESANIA);
         Producto pCollar = new Producto("Collar", 2000.0, 5);
         Producto pPulsera = new Producto("Pulsera", 800.0, 20);
@@ -33,7 +33,7 @@ public class Main {
         
         gestor.registrarEmprendedor(carlos);
 
-        // 3. Registrar Ventas (inyectando el objeto Producto directamente)
+        //Registrar Ventas (inyectando el objeto Producto directamente)
         Venta v1 = new Venta("V001", pEmpanadas, 10);
         Venta v2 = new Venta("V002", pCollar, 1);
         
@@ -44,12 +44,12 @@ public class Main {
 
         System.out.println(); // Salto de línea estético
 
-        // 4. Reporte por categoría (Usando el enum)
+        //Reporte por categoría (Usando el enum)
         reportes.imprimirReportePorCategoria(gestor, Categoria.COMIDA);
 
         System.out.println(); // Salto de línea estético
 
-        // 5. Procesar ventas pendientes y cobrar (Lógica extraída a la capa de control/main)
+        //Procesar ventas pendientes y cobrar (Lógica extraída a la capa de control/main)
         double totalRecaudado = 0;
         for (Venta v : gestor.getVentas()) {
             if (!v.isPagoRealizado()) {
@@ -63,26 +63,25 @@ public class Main {
         System.out.println("Total recaudado: $" + totalRecaudado);
         System.out.println();
 
-        // 6. Resumen Ejecutivo
+        //Resumen Ejecutivo
         reportes.imprimirResumenEjecutivo(gestor);
         System.out.println();
 
-        // 7. Validación manual usando la clase de utilidades
+        //Validación manual usando la clase de utilidades
         boolean anaEsValida = Validadores.isEmprendedorValido(gestor.getEmprendedores().get(0));
         System.out.println("Emprendedor Ana válido? " + anaEsValida);
 
-        // 8. Mostrar Info (Lógica de vista separada del modelo de datos)
-        imprimirInfoEmprendedor(gestor.getEmprendedores().get(0), "E001");
+        //Mostrar Info (Lógica de vista separada del modelo de datos)
+        imprimirInfoEmprendedor(gestor.getEmprendedores().get(0));
     }
 
     /**
      * Método auxiliar (Vista): Extraemos esto de la clase Emprendedor para 
      * no violar el Principio de Responsabilidad Única (SRP).
      */
-    private static void imprimirInfoEmprendedor(Emprendedor e, String idGenerico) {
+    private static void imprimirInfoEmprendedor(Emprendedor e) {
         System.out.println("Emprendedor: " + e.getNombre());
-        // (Nota: Si agregaste "public String getId()" en el refactor de Emprendedor, puedes usar e.getId() aquí)
-        System.out.println("ID: " + idGenerico);
+        System.out.println("ID: " + e.getId());
         System.out.println("Contacto: " + e.getTelefono() + " | " + e.getEmail());
         System.out.println("Categoría: " + e.getCategoria().name().toLowerCase());
         
